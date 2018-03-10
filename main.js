@@ -1,46 +1,42 @@
 const app = new Vue({
   el: '#app',
   data: {
-    friends: [
-      {
-        first: 'Bobby',
-        last: 'Boone',
-        age: 25
-      },
-      {
-        first: 'John',
-        last: 'Boby',
-        age: 35
-      }
-    ]
+    editFriend: null,
+    friends: []
   },
-  computed: {},
-  filters: {
-    ageInOneYear(age) {
-      return age + 1;
-    },
-    fullName(value) {
-      return `${value.last}, ${value.first}`;
-    }
+  mounted() {
+    fetch('http://rest.learncode.academy/api/vue-5/friends')
+      .then(res => res.json())
+      .then(data => (this.friends = data));
   },
   methods: {
-    incrementAge(friend) {
-      friend.age += 1;
+    updateFriend(friend) {
+      fetch(`http://rest.learncode.academy/api/vue-5/friends/${friend.id}`, {
+        body: JSON.stringify(friend),
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(() => (this.editFriend = null));
     },
-    decrementAge(friend) {
-      friend.age -= 1;
+    deleteFriend(id, i) {
+      fetch(`http://rest.learncode.academy/api/vue-5/friends/${id}`, {
+        method: 'DELETE'
+      }).then(this.friends.splice(i, 1));
     }
   },
   template: `
     <div>
-      <h2 v-for="friend in friends">
-        <h4> {{friend | fullName}} </h4>
-        <h5>age: {{friend.age}}</h5>
-        <button v-on:click="incrementAge(friend)">+</button>
-        <button v-on:click="decrementAge(friend)">-</button>
-        <input v-model="friend.first" />
-        <input v-model="friend.last" />        
-      </h2>
+      <li v-for="friend, i in friends">
+        <div v-if="editFriend === friend.id">
+          <input v-on:keyup.13="updateFriend(friend)" v-model="friend.name" />
+          <button v-on:click="updateFriend(friend)">save</button>
+        </div>
+        <div v-else>
+          <button v-on:click="editFriend = friend.id">edit</button>{{friend.name}}
+          <button v-on:click="deleteFriend(friend.id, i)">x</button>{{friend.name}}
+        </div>
+      </li>
     </div>
   `
 });
