@@ -1,7 +1,10 @@
 <template>
   <div id="app">
     <img src="./assets/logo.png">
-    <HelloWorld/>
+    <router-link to="friends">Friends</router-link>
+    <router-link to="account">Account</router-link>
+    <router-link to="contact">Contact</router-link>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -11,8 +14,8 @@ import HelloWorld from './components/HelloWorld';
 export default {
   name: 'App',
   components: {
-    HelloWorld,
-  },
+    HelloWorld
+  }
 };
 </script>
 
